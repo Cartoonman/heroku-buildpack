@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Does some serious copying.
+deep-cp() {
+  declare source="$1" target="$2"
+
+  mkdir -p "$target"
+
+  # cp doesn't like being called without source params,
+  # so make sure they expand to something first.
+  # subshell to avoid surprising caller with shopts.
+  (
+    shopt -s nullglob dotglob
+    set -- "$source"/!(tmp|.|..)
+    [[ $# == 0 ]] || cp -a "$@" "$target"
+  )
+}
+
+# Does some serious moving.
+deep-mv() {
+  deep-cp "$1" "$2"
+  deep-rm "$1"
+}
+
+# Does some serious deleting.
+deep-rm() {
+  # subshell to avoid surprising caller with shopts.
+  (
+    shopt -s dotglob
+    rm -rf "$1"/!(tmp|.|..)
+  )
+}
+
+git clone https://github.com/FoxelSA/norama-suite.git --recursive
+cd norama-suite
+
+git checkout v0.3.2
+make clean-all && make [OPENMP=false]
+make install
+ldconfig
+cd .
+deep-rm norama-suite
