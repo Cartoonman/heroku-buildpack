@@ -15,7 +15,7 @@ git clone https://github.com/FoxelSA/norama-suite.git --recursive
 cd norama-suite
 
 git checkout v0.3.2
-make clean && make build [OPENMP=false]
+make clean-all && make [OPENMP=false]
 make install
 ldconfig
 cd .
